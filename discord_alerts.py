@@ -27,12 +27,13 @@ def create_qualified_embed(row):
     return embed
 
 def create_disqualified_embed(row):
-    """Rich embed for research candidates"""
+    """Rich embed for research candidates (your preferred format)"""
     embed = discord.Embed(
-        title=f"⚠️ Disqualified: {row['Ticker']}",
+        title=f"Disqualified: {row['Ticker']}",
         color=0xff9900
     )
     
+    # Reasons section
     reasons = []
     if pd.isna(row.get('Current Price')):
         reasons.append("No market data available")
@@ -45,16 +46,27 @@ def create_disqualified_embed(row):
             atr_value = 0 if pd.isna(row.get('ATR %')) else row['ATR %']
             reasons.append(f"ATR {atr_value:.1f}% (needs 7-20%)")
     
-    embed.add_field(name="Reasons", value="\n".join(reasons) if reasons else "Unknown", inline=False)
-    embed.add_field(name="Insider", value=f"{row['Insider Name']} (${row['Value']:,.0f})", inline=True)
-    embed.add_field(name="Filed", value=datetime.strptime(row['Filing Date'], '%Y-%m-%d %H:%M:%S').strftime('%b %d'), inline=True)
+    embed.add_field(name="Reasons", value="\n".join(reasons), inline=False)
     
+    # Insider info
+    embed.add_field(
+        name="Insider", 
+        value=f"{row['Insider Name']} (${row['Value']:,.0f})", 
+        inline=True
+    )
+    embed.add_field(
+        name="Filed", 
+        value=datetime.strptime(row['Filing Date'], '%Y-%m-%d %H:%M:%S').strftime('%b %d'), 
+        inline=True
+    )
+    
+    # Market data if available
     if not pd.isna(row.get('Current Price')):
-        embed.add_field(name="Market Data", value=f"""
-        Price: ${row.get('Current Price', 0):.2f}
-        Volume: ${row.get('Daily Volume', 0)/1e6:.1f}M
-        ATR: {row.get('ATR %', 0):.1f}%
-        """, inline=False)
+        embed.add_field(
+            name="Market Data", 
+            value=f"Price: ${row['Current Price']:.2f}\nVolume: ${row['Daily Volume']/1e6:.1f}M\nATR: {row['ATR %']:.1f}%", 
+            inline=False
+        )
     
     return embed
 
