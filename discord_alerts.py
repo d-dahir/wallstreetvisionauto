@@ -27,9 +27,9 @@ def create_qualified_embed(row):
     return embed
 
 def create_disqualified_embed(row):
-    """Rich embed for research candidates (your preferred format)"""
+    """Rich embed for disqualified trades (EXACT format you want)"""
     embed = discord.Embed(
-        title=f"Disqualified: {row['Ticker']}",
+        title=f"⚠️ Disqualified: {row['Ticker']}",
         color=0xff9900
     )
     
@@ -49,16 +49,8 @@ def create_disqualified_embed(row):
     embed.add_field(name="Reasons", value="\n".join(reasons), inline=False)
     
     # Insider info
-    embed.add_field(
-        name="Insider", 
-        value=f"{row['Insider Name']} (${row['Value']:,.0f})", 
-        inline=True
-    )
-    embed.add_field(
-        name="Filed", 
-        value=datetime.strptime(row['Filing Date'], '%Y-%m-%d %H:%M:%S').strftime('%b %d'), 
-        inline=True
-    )
+    embed.add_field(name="Insider", value=f"{row['Insider Name']} (${row['Value']:,.0f})", inline=True)
+    embed.add_field(name="Filed", value=datetime.strptime(row['Filing Date'], '%Y-%m-%d %H:%M:%S').strftime('%b %d'), inline=True)
     
     # Market data if available
     if not pd.isna(row.get('Current Price')):
